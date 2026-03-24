@@ -27,7 +27,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const appId = "iceplaytime-app"; // 你的專屬 App ID
-const apiKey = "AIzaSyAO5_W7FRDBmUP3f__p7jmHG59W-oLF-lw";
+const apiKey = "AIzaSyAJpgrxzlNUF2SDLsPjMwwO9qGNADsySOo";
 
 const App = () => {
   const [activeTab, setActiveTab] = useState('split'); 
