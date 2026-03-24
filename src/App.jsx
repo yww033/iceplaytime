@@ -172,11 +172,12 @@ const TranslateSection = ({ user }) => {
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
       });
       const result = await response.json();
+      if (!response.ok) throw new Error(result.error?.message || "API 請求失敗");
       const translated = result.candidates?.[0]?.content?.parts?.[0]?.text || "";
       setNewPhrase({ ...newPhrase, korean: translated.trim() });
     } catch (err) { 
       console.warn(err);
-      alert("翻譯失敗"); 
+      alert(`AI 魔法失敗：${err.message}\n(如果看到 400 或 403，請確認 API Key 是否綁定帳單)`); 
     } 
     finally { setIsTranslating(false); }
   };
@@ -196,17 +197,20 @@ const TranslateSection = ({ user }) => {
     if (!image || !user) return;
     setLoading(true);
     try {
+      // 修復：動態抓取圖片格式，解決手機上傳 JPEG 被拒絕的問題
+      const mimeType = image.split(';')[0].split(':')[1] || "image/jpeg";
       const base64Data = image.split(',')[1];
       const prompt = `你是一個專業旅遊助手。請精準辨識圖片中「所有」的韓文字，並將「每一個」辨識到的區塊都翻譯成繁體中文，絕不能遺漏任何角落的文字。回傳純 JSON 格式：{"overlays": [{ "box_2d": [ymin, xmin, ymax, xmax], "text": "翻譯" }], "summary": "解說"}`;
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: "image/png", data: base64Data } }] }],
+          contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: mimeType, data: base64Data } }] }],
           generationConfig: { responseMimeType: "application/json", temperature: 0.1 }
         })
       });
       const result = await response.json();
+      if (!response.ok) throw new Error(result.error?.message || "API 請求失敗");
       const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) throw new Error("無效的翻譯結果");
       const parsed = JSON.parse(cleanJson(text));
@@ -220,7 +224,7 @@ const TranslateSection = ({ user }) => {
       setShowOverlay(true);
     } catch (err) { 
       console.warn("Overlay fetch failed:", err);
-      alert("掃描失敗，請確定圖片清晰或稍後再試。"); 
+      alert(`掃描失敗：${err.message}\n(請確認 API Key 是否設定正確)`); 
     }
     finally { setLoading(false); }
   };
@@ -528,6 +532,7 @@ const MapSection = ({ user }) => {
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", temperature: 0.1 } })
       });
       const result = await response.json();
+      if (!response.ok) throw new Error(result.error?.message || "API 請求失敗");
       const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) throw new Error("無效的解析結果");
       
@@ -556,7 +561,7 @@ const MapSection = ({ user }) => {
       setImportText("");
     } catch (err) { 
       console.warn("Import failed:", err);
-      alert("智慧解析失敗，請確認文字內容是否清晰。"); 
+      alert(`智慧解析失敗：${err.message}\n(請確認 API Key 是否設定正確)`); 
     }
     finally { setIsImporting(false); }
   };
@@ -575,6 +580,7 @@ const MapSection = ({ user }) => {
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", temperature: 0.2 } })
       });
       const result = await response.json();
+      if (!response.ok) throw new Error(result.error?.message || "API 請求失敗");
       const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) throw new Error("無效的解析結果");
       const parsed = JSON.parse(cleanJson(text));
@@ -589,7 +595,7 @@ const MapSection = ({ user }) => {
       await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'itinerary', detailItem.id), updatedItem);
     } catch (err) {
       console.warn("Detail fetch failed:", err);
-      alert("AI 查詢失敗");
+      alert(`AI 查詢失敗：${err.message}`);
     } finally {
       setIsAiFetchingDetail(false);
     }
@@ -796,6 +802,7 @@ const SplitBillSection = ({ user }) => {
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", temperature: 0.1 } })
       });
       const result = await response.json();
+      if (!response.ok) throw new Error(result.error?.message || "API 請求失敗");
       const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) throw new Error("無效的解析結果");
       const parsed = JSON.parse(cleanJson(text));
@@ -803,7 +810,7 @@ const SplitBillSection = ({ user }) => {
       setAiInput(""); setIsAiMode(false); setIsAddMode(true);
     } catch (err) { 
       console.warn("Parse failed:", err);
-      setErrorMsg("AI 解析失敗，請確認文字內是否包含明確的金額與墊付人"); // 取代 alert
+      setErrorMsg(`AI 解析失敗：${err.message}`); // 取代 alert
     }
     finally { setIsAiLoading(false); }
   };
