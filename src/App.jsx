@@ -166,7 +166,7 @@ const TranslateSection = ({ user }) => {
     setIsTranslating(true);
     try {
       const prompt = `你是一個專業韓文翻譯家。請將以下中文翻譯成「最有禮貌」的韓文敬語。請只回傳唯一的一句翻譯結果，絕對不要包含任何解釋、選項或引言。格式嚴格限定為：韓文原文 (羅馬拼音)。待翻譯中文：${newPhrase.title}`;
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -201,7 +201,7 @@ const TranslateSection = ({ user }) => {
       const mimeType = image.split(';')[0].split(':')[1] || "image/jpeg";
       const base64Data = image.split(',')[1];
       const prompt = `你是一個專業旅遊助手。請精準辨識圖片中「所有」的韓文字，並將「每一個」辨識到的區塊都翻譯成繁體中文，絕不能遺漏任何角落的文字。回傳純 JSON 格式：{"overlays": [{ "box_2d": [ymin, xmin, ymax, xmax], "text": "翻譯" }], "summary": "解說"}`;
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -526,7 +526,7 @@ const MapSection = ({ user }) => {
       
       待解析文字：\n${importText}`;
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", temperature: 0.1 } })
@@ -574,7 +574,7 @@ const MapSection = ({ user }) => {
       回傳純 JSON 格式，絕對不要加 Markdown：
       {"hours": "營業時間", "transport": "建議交通方式", "precautions": "注意事項"}`;
       
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", temperature: 0.2 } })
@@ -797,7 +797,7 @@ const SplitBillSection = ({ user }) => {
       4. sharers: 誰參與了分攤(陣列)。若無特別說明，請填入所有旅伴的名字。若有明確說明「誰不參與」或「只有誰參與」，請在陣列中精準排除或只保留該成員。
       5. category: 類別 (food, shop, stay, move)。
       只回傳純 JSON。`;
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", temperature: 0.1 } })
       });
