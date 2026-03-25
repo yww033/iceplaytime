@@ -27,7 +27,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const appId = "iceplaytime-app"; // 你的專屬 App ID
-const apiKey = "AIzaSyCPwnilIuhn5uuednAyNH_Iz3PnCUp69QI";
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
 const App = () => {
   const [activeTab, setActiveTab] = useState('split'); 
