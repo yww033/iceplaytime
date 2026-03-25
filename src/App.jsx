@@ -438,7 +438,7 @@ const MapSection = ({ user }) => {
         setWeather({ temp: '--', desc: '查詢即時天氣...', icon: <RefreshCw size={20} className="text-slate-400 animate-spin" /> });
         
         const prompt = `請找出韓國景點或城市「${loc}」的大約經緯度座標。只需回傳純 JSON 格式：{"lat": 37.5665, "lon": 126.9780}`;
-        const geoRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyCQ82vqZSeODGrEqOYoQvvQwZdwk3kAPBQ`, {
+        const geoRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent('AIzaSyCQ82vqZSeODGrEqOYoQvvQwZdwk3kAPBQ')}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json" } })
