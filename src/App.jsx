@@ -153,20 +153,26 @@ const TranslateSection = ({ user }) => {
 
 const speak = (text) => {
     if (!text) return;
-
-    // 1. 取得乾淨的韓文字串 (過濾掉括號與拼音)
+    
+    // 1. 取得乾淨韓文 (過濾掉中文與括號)
     const cleanKoreanText = text.split('(')[0].trim();
+    if (!cleanKoreanText) return;
 
-    // 2. 核心修復：先取消所有正在排隊的語音，確保這次點擊是最高優先級
-    window.speechSynthesis.cancel();
+    // 2. 建立 Google TTS 音訊網址 (ko 代表韓語)
+    const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleanKoreanText)}&tl=ko&client=tw-ob`;
 
-    const utterance = new SpeechSynthesisUtterance(cleanKoreanText);
-    utterance.lang = 'ko-KR';
-    utterance.rate = 0.8; // 稍微調慢一點點，讓旅伴聽得更清楚
-
-    // 3. 針對 iOS 的小技巧：強制重新啟動語音引擎
-    window.speechSynthesis.speak(utterance);
+    // 3. 建立音訊物件並播放
+    const audio = new Audio(ttsUrl);
+    
+    // 針對 iOS Safari 的播放優化
+    audio.play().catch(err => {
+      console.warn("播放失敗，嘗試二次觸發:", err);
+      // 如果被攔截，通常是因為需要更直接的用戶點擊
+      audio.load();
+      audio.play();
+    });
   };
+
   const handleAiTranslate = async () => {
     if (!newPhrase.title.trim() || isTranslating) return;
     setIsTranslating(true);
