@@ -151,16 +151,22 @@ const TranslateSection = ({ user }) => {
     localStorage.setItem('customSurvivalPhrases', JSON.stringify(survivalPhrases));
   }, [survivalPhrases]);
 
-  const speak = (text) => {
+const speak = (text) => {
+    if (!text) return;
+
+    // 1. 取得乾淨的韓文字串 (過濾掉括號與拼音)
     const cleanKoreanText = text.split('(')[0].trim();
-    if (!cleanKoreanText) return;
+
+    // 2. 核心修復：先取消所有正在排隊的語音，確保這次點擊是最高優先級
     window.speechSynthesis.cancel();
+
     const utterance = new SpeechSynthesisUtterance(cleanKoreanText);
     utterance.lang = 'ko-KR';
-    utterance.rate = 0.85;
+    utterance.rate = 0.8; // 稍微調慢一點點，讓旅伴聽得更清楚
+
+    // 3. 針對 iOS 的小技巧：強制重新啟動語音引擎
     window.speechSynthesis.speak(utterance);
   };
-
   const handleAiTranslate = async () => {
     if (!newPhrase.title.trim() || isTranslating) return;
     setIsTranslating(true);
@@ -477,37 +483,28 @@ const MapSection = ({ user }) => {
     fetchRealWeather();
   }, [selectedDay, itinerary]);
 
-  const handleNaverLink = (itemOrList) => {
-    if (!itemOrList) return;
-    
-    const getCleanName = (item) => {
-      const name = item.koreanName || item.name;
-      return name ? name.split('(')[0].trim() : '';
-    };
+const handleNaverLink = (itemOrList) => {
+  if (!itemOrList) return;
 
-    let targetItem = Array.isArray(itemOrList) ? itemOrList[itemOrList.length - 1] : itemOrList;
-    if (!targetItem) return;
-
-    const searchName = getCleanName(targetItem);
-    
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-    if (isMobile) {
-      const appUrl = `nmap://route/public?dname=${encodeURIComponent(searchName)}&appname=ICEPLAYTIME`;
-      const webUrl = `https://map.naver.com/p/search/${encodeURIComponent(searchName)}`;
-      
-      window.location.href = appUrl;
-      
-      setTimeout(() => {
-         window.open(webUrl, '_blank');
-      }, 1000);
-    } else {
-      window.open(`https://map.naver.com/p/search/${encodeURIComponent(searchName)}`, '_blank');
-    }
-    
-    setIsSelectingRoute(false); setRouteSelection([]);
+  const getCleanName = (item) => {
+    const name = item.koreanName || item.name;
+    return name ? name.split('(')[0].trim() : '';
   };
 
+  let targetItem = Array.isArray(itemOrList) ? itemOrList[itemOrList.length - 1] : itemOrList;
+  if (!targetItem) return;
+
+  const searchName = getCleanName(targetItem);
+
+  // 修正：使用 Naver Map 官方通用網址 (Universal Link)
+  // 這種格式在手機會自動詢問「是否開啟 Naver Map App」，沒裝則開網頁
+  const naverUrl = `https://map.naver.com/v5/search/${encodeURIComponent(searchName)}`;
+
+  window.open(naverUrl, '_blank');
+
+  setIsSelectingRoute(false);
+  setRouteSelection([]);
+};
   const handleSmartImport = async () => {
     if (!importText || !user) return;
     setIsImporting(true);
