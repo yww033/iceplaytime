@@ -122,7 +122,7 @@ const TranslateSection = ({ user }) => {
   const [showOverlay, setShowOverlay] = useState(true);
   const [rawAnalysis, setRawAnalysis] = useState("");
   const fileInputRef = useRef(null);
-
+const [currentlySpeakingId, setCurrentlySpeakingId] = useState(null);
   const [survivalPhrases, setSurvivalPhrases] = useState(() => {
     try {
       const saved = localStorage.getItem('customSurvivalPhrases');
@@ -151,27 +151,35 @@ const TranslateSection = ({ user }) => {
     localStorage.setItem('customSurvivalPhrases', JSON.stringify(survivalPhrases));
   }, [survivalPhrases]);
 
-const speak = (text) => {
+// 尋找 speak 函數並完整替換
+  const speak = (text, id = null) => {
     if (!text) return;
-    
-    // 1. 取得乾淨韓文 (過濾掉中文與括號)
+
     const cleanKoreanText = text.split('(')[0].trim();
     if (!cleanKoreanText) return;
 
-    // 2. 建立 Google TTS 音訊網址 (ko 代表韓語)
-    const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleanKoreanText)}&tl=ko&client=tw-ob`;
+    // 1. 設定目前正在說話的 ID，讓 UI 變色
+    if (id) setCurrentlySpeakingId(id);
 
-    // 3. 建立音訊物件並播放
+    // 2. 建立 Google TTS 音訊
+    const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleanKoreanText)}&tl=ko&client=tw-ob`;
     const audio = new Audio(ttsUrl);
-    
-    // 針對 iOS Safari 的播放優化
+
+    // 3. 當聲音播放結束或出錯時，把 ID 清空（顏色回復原狀）
+    audio.onended = () => setCurrentlySpeakingId(null);
+    audio.onerror = () => setCurrentlySpeakingId(null);
+
+    // 4. 執行播放
     audio.play().catch(err => {
-      console.warn("播放失敗，嘗試二次觸發:", err);
-      // 如果被攔截，通常是因為需要更直接的用戶點擊
+      console.warn("iOS 播放攔截，嘗試二次喚醒:", err);
       audio.load();
-      audio.play();
+      audio.play().finally(() => {
+        // 如果連二次嘗試都失敗，也要確保 UI 顏色會變回來
+        setTimeout(() => setCurrentlySpeakingId(null), 2000);
+      });
     });
   };
+
 
   const handleAiTranslate = async () => {
     if (!newPhrase.title.trim() || isTranslating) return;
