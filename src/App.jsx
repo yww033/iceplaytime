@@ -641,8 +641,9 @@ const MapSection = ({ user }) => {
         ...detailItem,
         hours: parsed.hours || detailItem.hours,
         transport: parsed.transport || detailItem.transport,
-        precautions: parsed.precautions || detailItem.precautions
-      };
+        precautions: parsed.precautions || detailItem.precautions,
+     duration: parsed.duration || detailItem.duration
+ };
       setDetailItem(updatedItem);
       await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'itinerary', detailItem.id), updatedItem);
     } catch (err) {
