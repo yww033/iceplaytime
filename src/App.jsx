@@ -61,7 +61,7 @@ const App = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen w-full bg-slate-50 text-slate-800 font-sans overflow-hidden select-none text-[16px]">
+    <div className="flex flex-col md:flex-row h-screen w-full bg-slate-50 text-slate-800 font-sans overflow-hidden select-none text-[17px] leading-relaxed">
 
       {/* 行動版 Header (使用冰雪藍 #6398A9) */}
       <header className="md:hidden bg-[#6398A9] p-4 pt-12 pb-4 flex justify-between items-center shadow-md shrink-0 z-50 text-white">
@@ -617,7 +617,13 @@ const MapSection = ({ user }) => {
     setIsAiFetchingDetail(true);
     try {
       const prompt = `你是一個韓國旅遊達人。請提供韓國景點「${detailItem.name} (${detailItem.koreanName})」的詳細資訊。
-      回傳純 JSON 格式，絕對不要加 Markdown：
+【回傳規範】
+      1. hours: 營業時間。
+      2. transport: 建議交通方式。
+      3. precautions: 注意事項，必須使用「- 」開頭進行「條列式」呈現，每點獨立一行。
+      4. duration: 建議停留時間 (例如：1.5 - 2 小時)。
+     
+ 回傳純 JSON 格式，絕對不要加 Markdown：
       {"hours": "營業時間", "transport": "建議交通方式", "precautions": "注意事項"}`;
 
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
@@ -779,7 +785,15 @@ const MapSection = ({ user }) => {
             </div>
             <div className="flex-1 overflow-y-auto p-8 md:p-10 space-y-8 pb-24 bg-white text-slate-800">
               <DetailField icon={<LinkIcon className="text-[#6398A9]" />} label="Naver Map 網址" value={detailItem.naverLink} isEditing={isEditing} onChange={(v) => setDetailItem({ ...detailItem, naverLink: v })} placeholder="貼上 Naver 分享連結" />
-              <DetailField icon={<Clock className="text-[#F9B95C]" />} label="營業時間" value={detailItem.hours} isEditing={isEditing} onChange={(v) => setDetailItem({ ...detailItem, hours: v })} />
+ <DetailField icon={<Clock className="text-[#F9B95C]" />} label="營業時間" value={detailItem.hours} isEditing={isEditing} onChange={(v) => setDetailItem({ ...detailItem, hours: v })} />
+ <DetailField
+                icon={<Clock className="text-[#6398A9]" />}
+                label="建議停留時間"
+                value={detailItem.duration}
+                isEditing={isEditing}
+                onChange={(v) => setDetailItem({ ...detailItem, duration: v })}
+                placeholder="例如：1.5 - 2 小時"
+              />
               <DetailField icon={<Bus className="text-[#96C7B3]" />} label="交通方式" value={detailItem.transport} isEditing={isEditing} onChange={(v) => setDetailItem({ ...detailItem, transport: v })} />
               <DetailField icon={<AlertTriangle className="text-[#D7897F]" />} label="注意事項" value={detailItem.precautions} isEditing={isEditing} onChange={(v) => setDetailItem({ ...detailItem, precautions: v })} />
               <DetailField icon={<Edit3 className="text-slate-400" />} label="個人備註" value={detailItem.memo} isEditing={isEditing} onChange={(v) => setDetailItem({ ...detailItem, memo: v })} />
