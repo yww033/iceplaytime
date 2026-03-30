@@ -359,7 +359,10 @@ const TranslateSection = ({ user }) => {
               onClick={() => setIsPresetOpen(!isPresetOpen)}
               className="flex justify-between items-center w-full px-4 py-3 mb-2 rounded-2xl group hover:bg-slate-100 transition-colors"
             >
-              <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest group-hover:text-[#D7897F] transition-colors">正式敬語 生存模板</p>
+<p className="text-[15px] font-black text-slate-600 group-hover:text-[#D7897F] transition-colors flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-[#D7897F] rounded-full"></span>
+                正式敬語 生存模板
+              </p>
               <ChevronRight size={18} className={`text-slate-400 transition-transform duration-300 ${isPresetOpen ? 'rotate-90' : ''}`} />
             </button>
 
@@ -393,7 +396,10 @@ const TranslateSection = ({ user }) => {
 
           <div className="pt-4 border-t border-slate-200">
             <div className="flex justify-between items-center px-4 mb-5 mt-2">
-              <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">自定義生存語 (智慧翻譯)</p>
+<p className="text-[15px] font-black text-slate-600 flex items-center gap-2">
+  <span className="w-1.5 h-1.5 bg-[#96C7B3] rounded-full"></span>
+  自定義生存語 (智慧翻譯)
+</p>
               <button onClick={() => setIsAddMode(true)} className="p-2.5 bg-[#F9B95C] text-white rounded-full shadow-md hover:bg-opacity-90 hover:scale-105 active:scale-95 transition-all"><Plus size={18} /></button>
             </div>
 
@@ -425,9 +431,10 @@ const TranslateSection = ({ user }) => {
                 );
               })}
               {survivalPhrases.length === 0 && (
-                <div className="md:col-span-2 xl:col-span-3 py-16 text-center text-slate-400 font-bold tracking-widest border-2 border-dashed border-slate-200 rounded-[2.5rem]">
-                  還沒有自定義小卡，點擊上方 "+" 建立
-                </div>
+<div className="md:col-span-2 xl:col-span-3 py-16 text-center bg-slate-50/50 border-2 border-dashed border-slate-200 rounded-[2.5rem]">
+  <p className="text-base font-black text-slate-400">目前尚無自定義小卡</p>
+  <p className="text-xs font-bold text-slate-400 mt-2">點擊上方黃色 "+" 按鈕開始建立</p>
+</div>
               )}
             </div>
           </div>
