@@ -1094,9 +1094,10 @@ const SplitBillSection = ({ user }) => {
           <div className="bg-white rounded-[3rem] md:rounded-[3.5rem] p-8 md:p-10 shadow-lg relative overflow-hidden border border-slate-200">
             <div className="absolute top-0 right-0 w-48 h-48 bg-[#6398A9] blur-[100px] opacity-10"></div>
             <div className="relative z-10 space-y-8">
-              <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                <Sparkles size={16} className="text-[#F9B95C]" /> 最終分帳結論 (韓元)
-              </p>
+<p className="text-[15px] font-black text-slate-600 flex items-center gap-2 mb-2">
+  <span className="w-1.5 h-1.5 bg-[#F9B95C] rounded-full"></span>
+  最終分帳結論 (韓元)
+</p>
               {settlement.length > 0 ? (
                 <div className="space-y-3 bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-inner font-bold">
                   {settlement.map((s, i) => (
@@ -1128,8 +1129,10 @@ const SplitBillSection = ({ user }) => {
         {/* 右欄：支出歷史清單 */}
         <div className="md:col-span-5 space-y-4 md:bg-slate-50 md:p-6 md:rounded-[3rem] md:border md:border-slate-200 md:h-fit">
           <div className="flex justify-between items-center px-2 mb-2">
-            <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">歷史支出明細</p>
-          </div>
+<p className="text-[15px] font-black text-slate-600 flex items-center gap-2">
+  <span className="w-1.5 h-1.5 bg-[#6398A9] rounded-full"></span>
+  歷史支出明細
+</p>          </div>
           {expenses.sort((a, b) => b.createdAt - a.createdAt).map(e => (
             <div key={e.id} className="bg-white p-5 rounded-[2.2rem] flex items-center justify-between shadow-sm border border-slate-100 hover:shadow-md transition-shadow group">
               <div className="flex items-center gap-4">
@@ -1246,10 +1249,12 @@ const CurrencySection = () => {
           </div>
 
           {/* 巨型歸零按鈕 */}
-          <button onClick={clearAll} className="w-full md:w-28 py-6 md:py-0 self-stretch bg-[#F9B95C] text-white rounded-[2.5rem] flex flex-row md:flex-col items-center justify-center gap-3 hover:bg-[#E5A548] active:scale-95 transition-all shadow-md">
-            <Eraser size={28} />
-            <span className="text-sm md:text-[11px] font-bold tracking-[0.3em] md:[writing-mode:vertical-lr]">歸零</span>
-          </button>
+<button onClick={clearAll} className="w-full md:w-28 py-6 md:py-0 self-stretch bg-[#F9B95C] text-white rounded-[2.5rem] flex flex-row md:flex-col items-center justify-center gap-3 hover:bg-[#E5A548] active:scale-95 transition-all shadow-md">
+  {/* ICON 從 28 放大到 32 */}
+  <Eraser size={32} />
+  {/* 文字從 text-sm 提升到 15px 並加粗，移除字間距 */}
+  <span className="text-[15px] font-black tracking-normal md:[writing-mode:vertical-lr]">歸零</span>
+</button>
         </div>
 
         <div className="mt-8 pt-6 border-t border-slate-100 flex justify-end">
