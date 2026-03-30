@@ -817,9 +817,30 @@ const MapSection = ({ user }) => {
   );
 };
 
+
 const DetailField = ({ icon, label, value, isEditing, onChange, placeholder }) => (
-  <div className="space-y-3"><div className="flex items-center gap-2 text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">{icon} {label}</div>{isEditing ? (<textarea className="w-full p-5 bg-[#F9F8F4] rounded-2xl text-sm md:text-base font-bold border-none outline-none focus:ring-2 ring-[#6398A9]/30 min-h-[100px] resize-none text-slate-800" value={value || ""} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} />) : (<p className="text-sm md:text-base text-slate-700 font-bold ml-8 md:ml-9 break-all leading-relaxed whitespace-pre-wrap">{value || "尚未輸入資訊"}</p>)}</div>
+  <div className="space-y-3">
+    {/* 標題：放大到 14px 並加粗 */}
+    <div className="flex items-center gap-2 text-[14px] font-black text-slate-500 tracking-normal uppercase">
+      {icon} {label}
+    </div>
+    
+    {isEditing ? (
+      <textarea 
+        className="w-full p-5 bg-[#F9F8F4] rounded-2xl text-[16px] font-bold border-none outline-none focus:ring-2 ring-[#6398A9]/30 min-h-[100px] resize-none text-slate-800" 
+        value={value || ""} 
+        onChange={(e) => onChange(e.target.value)} 
+        placeholder={placeholder} 
+      />
+    ) : (
+      /* 內文：從 14px 提升到 16px，使用 font-bold 並讓行高更寬 */
+      <p className="text-[16px] text-slate-700 font-bold ml-1 break-all leading-[1.8] whitespace-pre-wrap bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+        {value || "尚未輸入資訊"}
+      </p>
+    )}
+  </div>
 );
+
 
 // --- 分帳模組 ---
 const SplitBillSection = ({ user }) => {
@@ -991,7 +1012,21 @@ const SplitBillSection = ({ user }) => {
             <div className="bg-white p-6 md:p-8 rounded-[2.5rem] md:rounded-[3rem] shadow-lg border border-slate-100 space-y-6 animate-in slide-in-from-bottom-10 font-bold">
               <div className="flex justify-between items-center font-bold tracking-widest font-serif"><h3 className="text-slate-800 text-xl">新增開銷明細</h3><button onClick={() => { setIsAddMode(false); setErrorMsg(""); }} className="text-slate-400 hover:text-slate-600 transition-colors"><X size={24} /></button></div>
               <div className="grid grid-cols-4 gap-3">
-                {categories.map(c => (<button key={c.id} onClick={() => setNewExp({ ...newExp, category: c.id })} className={`py-4 rounded-2xl flex flex-col items-center gap-2 transition-all border ${newExp.category === c.id ? 'bg-[#D7897F] border-[#D7897F] text-white shadow-md' : 'bg-slate-50 border-slate-100 text-slate-400 hover:bg-slate-100'}`}>{c.icon}<span className="text-[10px] font-bold tracking-widest">{c.name}</span></button>))}
+{categories.map(c => (
+                  <button
+                    key={c.id}
+                    onClick={() => setNewExp({ ...newExp, category: c.id })}
+                    className={`py-4 rounded-2xl flex flex-col items-center gap-2 transition-all border ${newExp.category === c.id
+                        ? 'bg-[#D7897F] border-[#D7897F] text-white shadow-md scale-105'
+                        : 'bg-slate-50 border-slate-100 text-slate-400 hover:bg-slate-100'
+                      }`}
+                  >
+                    {/* 圖示稍微加大 */}
+                    <div className="scale-125 mb-1">{c.icon}</div>
+                    {/* 文字：從 10px 提升到 13px，改用 font-black */}
+                    <span className="text-[13px] font-black tracking-normal">{c.name}</span>
+                  </button>
+                ))}
               </div>
               <div className="space-y-5 bg-slate-50 p-5 md:p-6 rounded-3xl border border-slate-100 shadow-sm">
                 <input placeholder="消費項目名稱..." className="w-full bg-transparent border-none outline-none text-base md:text-lg font-bold text-slate-800 placeholder:text-slate-300" value={newExp.title} onChange={e => setNewExp({ ...newExp, title: e.target.value })} />
