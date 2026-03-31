@@ -852,7 +852,8 @@ const SplitBillSection = ({ user }) => {
   const [currencyMode, setCurrencyMode] = useState('KRW');
   const [newExp, setNewExp] = useState({ title: "", amount: "", payers: {}, sharers: [], category: "food" });
   const [errorMsg, setErrorMsg] = useState("");
-  const [depositPerPerson, setDepositPerPerson] = useState(""); // 🚀 新增：控制每人存錢金額
+  const [depositPerPerson, setDepositPerPerson] = useState("");
+  const [selectedHistoryItem, setSelectedHistoryItem] = useState(null); // 🚀 新增：控制歷史明細彈窗
 
   const sortedMembers = [...members].sort((a, b) => {
     if (a.isWallet) return -1;
@@ -888,14 +889,15 @@ const SplitBillSection = ({ user }) => {
     try {
       const memberNames = members.map(m => m.name).join(', ');
       // 強化 AI Prompt：明確教導 AI 處理「誰不參與分攤」的邏輯
+      // 🚀 強化 AI Prompt：死守公積金名稱，並學會辨識「存款」
       const prompt = `你是一個專業記帳助手。旅伴有：${memberNames}。請解析文字轉化為 JSON。
       文字：${aiInput}
       【規則】
       1. title: 項目名稱。
       2. amount: 總金額數字。
-      3. payers: 誰付了錢及金額的物件 (例如 {"A": 50000})。
-      4. sharers: 誰參與了分攤(陣列)。若無特別說明，請填入所有旅伴的名字。若有明確說明「誰不參與」或「只有誰參與」，請在陣列中精準排除或只保留該成員。
-      5. category: 類別 (food, shop, stay, move)。
+      3. payers: 誰付了錢及金額的物件 (例如 {"A": 50000})。⚠️ 若提到「公積金、公費、錢包」付錢，請一律使用精確名稱 "💰 公積金錢包"。
+      4. sharers: 誰參與了分攤(陣列)。若無特別說明，填入所有旅伴的名字。若有明確說明「誰不參與」，請精準排除。⚠️ 若語意為「大家交錢/存入公費/存公積金」，請強制設為 ["💰 公積金錢包"]。
+      5. category: 類別 (food, shop, stay, move)。⚠️ 若語意為「存錢/交公費/存公積金」，請強制設為 "deposit"。
       只回傳純 JSON。`;
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -906,15 +908,29 @@ const SplitBillSection = ({ user }) => {
       const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) throw new Error("無效的解析結果");
       const parsed = JSON.parse(cleanJson(text));
+      // 👇 --- 2. 這裡就是加入了「智慧跳轉判斷」 --- 👇
       setNewExp({ title: parsed.title || "", amount: parsed.amount || "", payers: parsed.payers || {}, sharers: parsed.sharers || members.map(m => m.name), category: parsed.category || "food" });
-      setAiInput(""); setIsAiMode(false); setIsAddMode(true);
+      setAiInput("");
+      setIsAiMode(false);
+
+      if (parsed.category === 'deposit') {
+        setIsDepositMode(true);
+        setIsAddMode(false);
+        // 若 AI 有抓到付款人，自動帶入第一人的金額到快速輸入框
+        const firstVal = parsed.payers ? Object.values(parsed.payers)[0] : "";
+        setDepositPerPerson(firstVal ? String(firstVal) : "");
+      } else {
+        setIsAddMode(true);
+        setIsDepositMode(false);
+      }
+      // 👆 --- 智慧跳轉結束 --- 👆
+
     } catch (err) {
       console.warn("Parse failed:", err);
-      setErrorMsg(`AI 解析失敗：${err.message}`); // 取代 alert
+      setErrorMsg(`AI 解析失敗：${err.message}`);
     }
     finally { setIsAiLoading(false); }
   };
-
   const addExpense = async () => {
     setErrorMsg(""); // 每次按下前清空錯誤訊息
     const totalP = Object.values(newExp.payers).reduce((s, v) => s + Number(v), 0);
@@ -941,6 +957,7 @@ const SplitBillSection = ({ user }) => {
     setNewExp({ title: "", amount: "", payers: {}, sharers: members.map(m => m.name), category: "food" });
     setErrorMsg("");
     setIsAddMode(false);
+    setIsDepositMode(false);
   };
 
   // 核心升級：公私分離的「雙帳本引擎」
@@ -1006,7 +1023,7 @@ const SplitBillSection = ({ user }) => {
           <div className="bg-white p-6 md:p-8 rounded-[2.5rem] md:rounded-[3rem] shadow-sm border border-slate-200">
             <h3 className="font-bold tracking-widest text-sm md:text-base flex items-center gap-2 mb-5 text-[#6398A9]"><Users size={20} /> 旅伴名單</h3>
             <div className="flex items-center gap-2 overflow-x-auto pb-3 scrollbar-hide mb-4">
-              {members.map(m => (
+              {sortedMembers.map(m => (
                 <div key={m.id} className={`px-4 py-2 rounded-full flex items-center gap-2 border font-bold shadow-sm whitespace-nowrap shrink-0 ${m.isWallet ? 'bg-[#6398A9]/10 border-[#6398A9]/20 text-[#6398A9]' : 'bg-[#96C7B3]/10 border-[#96C7B3]/20 text-[#96C7B3]'}`}>
                   <span className="text-xs md:text-sm tracking-wide">{m.name}</span>
                   {/* 關鍵防呆：只有「不是錢包」的真人才可以被刪除 */}
@@ -1222,9 +1239,21 @@ const SplitBillSection = ({ user }) => {
                 </div>
               </div>
 
-              {/* 一般消費：誰墊付了錢？ */}
+              {/* 🚀 一般消費：誰墊付了錢？ (加入神級動態防呆) */}
               <div className="space-y-4 pt-4 border-t border-slate-100">
-                <p className="text-[14px] font-black text-slate-600 ml-1">誰墊付了錢？</p>
+                <div className="flex justify-between items-center ml-1">
+                  <p className="text-[14px] font-black text-slate-600">誰墊付了錢？</p>
+                  {/* 動態餘額計算提示器 */}
+                  {(() => {
+                    const totalA = Number(newExp.amount) || 0;
+                    const currentP = Object.values(newExp.payers).reduce((s, v) => s + Number(v), 0);
+                    const diff = totalA - currentP;
+                    if (totalA === 0) return null;
+                    if (diff === 0) return <span className="text-[11px] font-bold text-[#96C7B3] bg-[#96C7B3]/10 px-2 py-1 rounded-md">✅ 已完全分配</span>;
+                    if (diff > 0) return <span className="text-[11px] font-bold text-[#F9B95C] bg-[#F9B95C]/10 px-2 py-1 rounded-md">⚠️ 尚差 ₩ {diff.toLocaleString()}</span>;
+                    return <span className="text-[11px] font-bold text-[#D7897F] bg-[#D7897F]/10 px-2 py-1 rounded-md">🛑 溢出 ₩ {Math.abs(diff).toLocaleString()}</span>;
+                  })()}
+                </div>
                 {sortedMembers.map(m => (
                   <div key={m.id} className={`flex items-center justify-between p-2 rounded-2xl mb-1 ${m.isWallet ? 'bg-[#6398A9]/10 border border-[#6398A9]/20' : ''}`}>
                     <span className={`text-[15px] font-black ${m.isWallet ? 'text-[#6398A9]' : 'text-slate-600'}`}>{m.name}</span>
@@ -1318,7 +1347,7 @@ const SplitBillSection = ({ user }) => {
             <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">歷史支出明細</p>
           </div>
           {expenses.sort((a, b) => b.createdAt - a.createdAt).map(e => (
-            <div key={e.id} className="bg-white p-5 rounded-[2.2rem] flex items-center justify-between shadow-sm border border-slate-100 hover:shadow-md transition-shadow group">
+            <div key={e.id} onClick={() => setSelectedHistoryItem(e)} className="bg-white p-5 rounded-[2.2rem] flex items-center justify-between shadow-sm border border-slate-100 hover:shadow-md transition-all group cursor-pointer active:scale-[0.98]">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 shrink-0 bg-[#6398A9]/10 border border-[#6398A9]/20 rounded-2xl flex items-center justify-center text-[#6398A9] shadow-inner group-hover:bg-[#6398A9]/20 transition-colors">
                   {categories.find(c => c.id === e.category)?.icon || <Wallet size={18} />}
@@ -1340,9 +1369,8 @@ const SplitBillSection = ({ user }) => {
               <div className="text-right flex items-center gap-2 shrink-0">
                 <div className="flex flex-col items-end justify-center">
                   <p className="font-serif text-base md:text-lg tracking-tight text-slate-800">₩ {Math.round(e.amount).toLocaleString()}</p>
-                  {e.originalCurrency === 'TWD' && <p className="text-[9px] text-slate-400 font-bold tracking-widest">$ {e.originalAmount}</p>}
                 </div>
-                <button onClick={() => deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'expenses', e.id))} className="text-slate-200 hover:text-[#D7897F] transition-colors p-2 md:opacity-0 md:group-hover:opacity-100"><Trash2 size={18} /></button>
+                <button onClick={(e_evt) => { e_evt.stopPropagation(); deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'expenses', e.id)); }} className="text-slate-200 hover:text-[#D7897F] transition-colors p-2 md:opacity-0 md:group-hover:opacity-100"><Trash2 size={18} /></button>
               </div>
             </div>
           ))}
@@ -1352,7 +1380,44 @@ const SplitBillSection = ({ user }) => {
             </div>
           )}
         </div>
+        {/* 🚀 歷史明細詳細彈窗 (解決金魚腦問題) */}
+        {selectedHistoryItem && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-300">
+            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedHistoryItem(null)}></div>
+            <div className="relative w-full max-w-sm bg-white rounded-[2.5rem] shadow-2xl p-6 md:p-8 space-y-6 animate-in zoom-in-95 border border-slate-200">
+              <div className="flex justify-between items-center">
+                <h3 className="font-bold font-serif text-xl text-slate-800 truncate pr-4">{selectedHistoryItem.title}</h3>
+                <button onClick={() => setSelectedHistoryItem(null)} className="text-slate-400 hover:text-slate-600 transition-colors"><X size={24} /></button>
+              </div>
 
+              <div className="text-center bg-slate-50 py-8 rounded-3xl border border-slate-100 shadow-inner">
+                <p className="text-[11px] font-bold text-slate-400 mb-1 tracking-widest uppercase">總金額</p>
+                <p className="text-4xl font-serif font-bold text-[#6398A9]">₩ {Number(selectedHistoryItem.amount).toLocaleString()}</p>
+              </div>
+
+              <div className="space-y-5">
+                <div>
+                  <p className="text-[12px] font-black text-slate-400 mb-3 flex items-center gap-2"><Wallet size={14} /> 出錢的人 (墊付)</p>
+                  {Object.entries(selectedHistoryItem.payers || {}).map(([n, a]) => (
+                    <div key={n} className="flex justify-between items-center text-[14px] font-bold text-slate-700 mb-2 bg-slate-50 px-3 py-2 rounded-xl">
+                      <span className={n === '💰 公積金錢包' ? 'text-[#6398A9]' : ''}>{n}</span>
+                      <span className="font-serif">₩ {Number(a).toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="pt-5 border-t border-slate-100">
+                  <p className="text-[12px] font-black text-slate-400 mb-3 flex items-center gap-2"><Users size={14} /> 參與的人 (分攤)</p>
+                  <div className="flex flex-wrap gap-2">
+                    {(selectedHistoryItem.sharers || []).map(s => (
+                      <span key={s} className={`px-3 py-1.5 rounded-lg text-[13px] font-black shadow-sm ${s === '💰 公積金錢包' ? 'bg-[#96C7B3]/10 text-[#96C7B3] border border-[#96C7B3]/20' : 'bg-slate-100 text-slate-600'}`}>{s}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* --- 這裡接原本的最後兩個 </div> --- */}
       </div>
     </div>
   );
