@@ -114,7 +114,6 @@ const cleanJson = (str) => {
 };
 
 // --- 翻譯與生存韓文模組 ---
-// --- 翻譯與生存韓文模組 ---
 const TranslateSection = ({ user }) => {
   const [subTab, setSubTab] = useState('survival');
   const [image, setImage] = useState(null);
@@ -359,7 +358,7 @@ const TranslateSection = ({ user }) => {
               onClick={() => setIsPresetOpen(!isPresetOpen)}
               className="flex justify-between items-center w-full px-4 py-3 mb-2 rounded-2xl group hover:bg-slate-100 transition-colors"
             >
-<p className="text-[15px] font-black text-slate-600 group-hover:text-[#D7897F] transition-colors flex items-center gap-2">
+              <p className="text-[15px] font-black text-slate-600 group-hover:text-[#D7897F] transition-colors flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-[#D7897F] rounded-full"></span>
                 正式敬語 生存模板
               </p>
@@ -396,10 +395,10 @@ const TranslateSection = ({ user }) => {
 
           <div className="pt-4 border-t border-slate-200">
             <div className="flex justify-between items-center px-4 mb-5 mt-2">
-<p className="text-[15px] font-black text-slate-600 flex items-center gap-2">
-  <span className="w-1.5 h-1.5 bg-[#96C7B3] rounded-full"></span>
-  自定義生存語 (智慧翻譯)
-</p>
+              <p className="text-[15px] font-black text-slate-600 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-[#96C7B3] rounded-full"></span>
+                自定義生存語 (智慧翻譯)
+              </p>
               <button onClick={() => setIsAddMode(true)} className="p-2.5 bg-[#F9B95C] text-white rounded-full shadow-md hover:bg-opacity-90 hover:scale-105 active:scale-95 transition-all"><Plus size={18} /></button>
             </div>
 
@@ -431,10 +430,10 @@ const TranslateSection = ({ user }) => {
                 );
               })}
               {survivalPhrases.length === 0 && (
-<div className="md:col-span-2 xl:col-span-3 py-16 text-center bg-slate-50/50 border-2 border-dashed border-slate-200 rounded-[2.5rem]">
-  <p className="text-base font-black text-slate-400">目前尚無自定義小卡</p>
-  <p className="text-xs font-bold text-slate-400 mt-2">點擊上方黃色 "+" 按鈕開始建立</p>
-</div>
+                <div className="md:col-span-2 xl:col-span-3 py-16 text-center bg-slate-50/50 border-2 border-dashed border-slate-200 rounded-[2.5rem]">
+                  <p className="text-base font-black text-slate-400">目前尚無自定義小卡</p>
+                  <p className="text-xs font-bold text-slate-400 mt-2">點擊上方黃色 "+" 按鈕開始建立</p>
+                </div>
               )}
             </div>
           </div>
@@ -624,13 +623,12 @@ const MapSection = ({ user }) => {
     setIsAiFetchingDetail(true);
     try {
       const prompt = `你是一個韓國旅遊達人。請提供韓國景點「${detailItem.name} (${detailItem.koreanName})」的詳細資訊。
-【回傳規範】
+      【回傳規範】
       1. hours: 營業時間。
       2. transport: 建議交通方式。
       3. precautions: 注意事項，必須使用「- 」開頭進行「條列式」呈現，每點獨立一行。
       4. duration: 建議停留時間 (例如：1.5 - 2 小時)。
-     
- 回傳純 JSON 格式，絕對不要加 Markdown：
+      回傳純 JSON 格式，絕對不要加 Markdown：
       {"hours": "營業時間", "transport": "建議交通方式", "precautions": "注意事項"}`;
 
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
@@ -649,8 +647,8 @@ const MapSection = ({ user }) => {
         hours: parsed.hours || detailItem.hours,
         transport: parsed.transport || detailItem.transport,
         precautions: parsed.precautions || detailItem.precautions,
-     duration: parsed.duration || detailItem.duration
- };
+        duration: parsed.duration || detailItem.duration
+      };
       setDetailItem(updatedItem);
       await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'itinerary', detailItem.id), updatedItem);
     } catch (err) {
@@ -793,8 +791,8 @@ const MapSection = ({ user }) => {
             </div>
             <div className="flex-1 overflow-y-auto p-8 md:p-10 space-y-8 pb-24 bg-white text-slate-800">
               <DetailField icon={<LinkIcon className="text-[#6398A9]" />} label="Naver Map 網址" value={detailItem.naverLink} isEditing={isEditing} onChange={(v) => setDetailItem({ ...detailItem, naverLink: v })} placeholder="貼上 Naver 分享連結" />
- <DetailField icon={<Clock className="text-[#F9B95C]" />} label="營業時間" value={detailItem.hours} isEditing={isEditing} onChange={(v) => setDetailItem({ ...detailItem, hours: v })} />
- <DetailField
+              <DetailField icon={<Clock className="text-[#F9B95C]" />} label="營業時間" value={detailItem.hours} isEditing={isEditing} onChange={(v) => setDetailItem({ ...detailItem, hours: v })} />
+              <DetailField
                 icon={<Clock className="text-[#6398A9]" />}
                 label="建議停留時間"
                 value={detailItem.duration}
@@ -817,30 +815,29 @@ const MapSection = ({ user }) => {
   );
 };
 
-
+// 尋找 DetailField 組件並完整替換
 const DetailField = ({ icon, label, value, isEditing, onChange, placeholder }) => (
   <div className="space-y-3">
-    {/* 標題：放大到 14px 並加粗 */}
+
     <div className="flex items-center gap-2 text-[14px] font-black text-slate-500 tracking-normal uppercase">
       {icon} {label}
     </div>
-    
+
     {isEditing ? (
-      <textarea 
-        className="w-full p-5 bg-[#F9F8F4] rounded-2xl text-[16px] font-bold border-none outline-none focus:ring-2 ring-[#6398A9]/30 min-h-[100px] resize-none text-slate-800" 
-        value={value || ""} 
-        onChange={(e) => onChange(e.target.value)} 
-        placeholder={placeholder} 
+      <textarea
+        className="w-full p-5 bg-[#F9F8F4] rounded-2xl text-[16px] font-bold border-none outline-none focus:ring-2 ring-[#6398A9]/30 min-h-[100px] resize-none text-slate-800"
+        value={value || ""}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
       />
     ) : (
-      /* 內文：從 14px 提升到 16px，使用 font-bold 並讓行高更寬 */
+
       <p className="text-[16px] text-slate-700 font-bold ml-1 break-all leading-[1.8] whitespace-pre-wrap bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
         {value || "尚未輸入資訊"}
       </p>
     )}
   </div>
 );
-
 
 // --- 分帳模組 ---
 const SplitBillSection = ({ user }) => {
@@ -849,14 +846,15 @@ const SplitBillSection = ({ user }) => {
   const [newMember, setNewMember] = useState("");
   const [isAddMode, setIsAddMode] = useState(false);
   const [isAiMode, setIsAiMode] = useState(false);
-const [isDepositMode, setIsDepositMode] = useState(false); 
- const [aiInput, setAiInput] = useState("");
+  const [isDepositMode, setIsDepositMode] = useState(false);
+  const [aiInput, setAiInput] = useState("");
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [currencyMode, setCurrencyMode] = useState('KRW');
   const [newExp, setNewExp] = useState({ title: "", amount: "", payers: {}, sharers: [], category: "food" });
-  const [errorMsg, setErrorMsg] = useState(""); // 新增：用於替代 alert 的 UI 錯誤訊息狀態
+  const [errorMsg, setErrorMsg] = useState("");
+  const [depositPerPerson, setDepositPerPerson] = useState(""); // 🚀 新增：控制每人存錢金額
 
-const sortedMembers = [...members].sort((a, b) => {
+  const sortedMembers = [...members].sort((a, b) => {
     if (a.isWallet) return -1;
     if (b.isWallet) return 1;
     return 0;
@@ -869,17 +867,16 @@ const sortedMembers = [...members].sort((a, b) => {
     { id: 'stay', name: '住宿', icon: <Home size={14} /> },
     { id: 'move', name: '交通', icon: <TrainFront size={14} /> }
   ];
-
   useEffect(() => {
     if (!user) return;
-const unsubM = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'members'), (s) => {
-  const fetchedMembers = s.docs.map(d => ({ id: d.id, ...d.data() }));
-  // 核心邏輯：如果成員名單是空的，自動新增公積金錢包
-  if (fetchedMembers.length === 0) {
-    addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'members'), { name: "💰 公積金錢包", isWallet: true });
-  }
-  setMembers(fetchedMembers);
-}, (err) => console.warn("Sync error:", err));
+    const unsubM = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'members'), (s) => {
+      const fetchedMembers = s.docs.map(d => ({ id: d.id, ...d.data() }));
+      // 核心邏輯：如果成員名單是空的，自動新增公積金錢包
+      if (fetchedMembers.length === 0) {
+        addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'members'), { name: "💰 公積金錢包", isWallet: true });
+      }
+      setMembers(fetchedMembers);
+    }, (err) => console.warn("Sync error:", err));
     const unsubE = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'expenses'), (s) => setExpenses(s.docs.map(d => ({ id: d.id, ...d.data() }))), (err) => console.warn("Sync error:", err));
     return () => { unsubM(); unsubE(); };
   }, [user]);
@@ -946,21 +943,49 @@ const unsubM = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', '
     setIsAddMode(false);
   };
 
-  const balances = (() => {
-    const b = {}; members.forEach(m => b[m.name] = 0);
+  // 核心升級：公私分離的「雙帳本引擎」
+  const { publicBalances, privateBalances, walletCash } = (() => {
+    const pub = {}; const priv = {};
+    members.forEach(m => { pub[m.name] = 0; priv[m.name] = 0; });
+    let cash = 0;
+
     expenses.forEach(exp => {
-      Object.entries(exp.payers || {}).forEach(([n, a]) => { if (b[n] !== undefined) b[n] += a; });
-      const per = exp.amount / (exp.sharers?.length || members.length);
-      (exp.sharers || members.map(m => m.name)).forEach(s => { if (b[s] !== undefined) b[s] -= per; });
+      // 判斷是否為公積金交易：錢包有付錢，或錢包是分攤者(收款)
+      const isPublic = exp.payers["💰 公積金錢包"] || (exp.sharers && exp.sharers.includes("💰 公積金錢包"));
+
+      if (isPublic) {
+        // 1. 實體錢包現金進出
+        if (exp.payers["💰 公積金錢包"]) cash -= Number(exp.payers["💰 公積金錢包"]);
+        if (exp.sharers && exp.sharers.includes("💰 公積金錢包")) cash += Number(exp.amount) / exp.sharers.length;
+
+        // 2. 計算每個人的「公積金存摺權益」
+        Object.entries(exp.payers || {}).forEach(([n, a]) => {
+          if (n !== "💰 公積金錢包" && pub[n] !== undefined) pub[n] += Number(a);
+        });
+        const perShare = Number(exp.amount) / (exp.sharers?.length || members.length);
+        (exp.sharers || members.map(m => m.name)).forEach(s => {
+          if (s !== "💰 公積金錢包" && pub[s] !== undefined) pub[s] -= perShare;
+        });
+      } else {
+        // 3. 計算純「私人恩怨」
+        Object.entries(exp.payers || {}).forEach(([n, a]) => {
+          if (priv[n] !== undefined) priv[n] += Number(a);
+        });
+        const perShare = Number(exp.amount) / (exp.sharers?.length || members.length);
+        (exp.sharers || members.map(m => m.name)).forEach(s => {
+          if (priv[s] !== undefined) priv[s] -= perShare;
+        });
+      }
     });
-    return b;
+    return { publicBalances: pub, privateBalances: priv, walletCash: Math.round(cash) };
   })();
 
-  const settlement = (() => {
+  // 私人債務結算 (公積金不再參與此處的結算)
+  const privateSettlement = (() => {
     let creds = []; let debts = [];
-    Object.keys(balances).forEach(n => {
-      if (balances[n] > 1) creds.push({ n, a: balances[n] });
-      else if (balances[n] < -1) debts.push({ n, a: Math.abs(balances[n]) });
+    Object.keys(privateBalances).forEach(n => {
+      if (privateBalances[n] > 1) creds.push({ n, a: privateBalances[n] });
+      else if (privateBalances[n] < -1) debts.push({ n, a: Math.abs(privateBalances[n]) });
     });
     const s = []; let di = 0, ci = 0;
     while (di < debts.length && ci < creds.length) {
@@ -970,21 +995,6 @@ const unsubM = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', '
       if (debts[di].a <= 1) di++; if (creds[ci].a <= 1) ci++;
     }
     return s;
-  })();
-const walletBalance = (() => {
-    let total = 0;
-    expenses.forEach(exp => {
-      // 邏輯：如果這筆錢是「公積金錢包」墊付的，餘額減少
-      if (exp.payers["💰 公積金錢包"]) {
-        total -= Number(exp.payers["💰 公積金錢包"]);
-      }
-      // 邏輯：如果這筆錢分攤者包含「公積金錢包」（例如大家收錢存進去），餘額增加
-      if (exp.sharers.includes("💰 公積金錢包")) {
-        const perShare = exp.amount / exp.sharers.length;
-        total += perShare;
-      }
-    });
-    return Math.round(total);
   })();
   return (
     <div className="p-4 md:p-0 animate-in fade-in duration-500 text-slate-800 pb-24">
@@ -997,9 +1007,12 @@ const walletBalance = (() => {
             <h3 className="font-bold tracking-widest text-sm md:text-base flex items-center gap-2 mb-5 text-[#6398A9]"><Users size={20} /> 旅伴名單</h3>
             <div className="flex items-center gap-2 overflow-x-auto pb-3 scrollbar-hide mb-4">
               {members.map(m => (
-                <div key={m.id} className="bg-[#96C7B3]/10 px-4 py-2 rounded-full flex items-center gap-2 border border-[#96C7B3]/20 text-[#96C7B3] font-bold shadow-sm whitespace-nowrap shrink-0">
+                <div key={m.id} className={`px-4 py-2 rounded-full flex items-center gap-2 border font-bold shadow-sm whitespace-nowrap shrink-0 ${m.isWallet ? 'bg-[#6398A9]/10 border-[#6398A9]/20 text-[#6398A9]' : 'bg-[#96C7B3]/10 border-[#96C7B3]/20 text-[#96C7B3]'}`}>
                   <span className="text-xs md:text-sm tracking-wide">{m.name}</span>
-                  <button onClick={() => deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'members', m.id))} className="text-[#96C7B3]/60 hover:text-[#D7897F] transition-colors"><X size={14} /></button>
+                  {/* 關鍵防呆：只有「不是錢包」的真人才可以被刪除 */}
+                  {!m.isWallet && (
+                    <button onClick={() => deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'members', m.id))} className="text-[#96C7B3]/60 hover:text-[#D7897F] transition-colors"><X size={14} /></button>
+                  )}
                 </div>
               ))}
             </div>
@@ -1008,7 +1021,8 @@ const walletBalance = (() => {
               <button onClick={async () => { if (!newMember.trim()) return; await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'members'), { name: newMember.trim() }); setNewMember(""); }} className="bg-[#96C7B3] text-white p-4 rounded-2xl shadow-md hover:bg-[#7CB49D] active:scale-95 transition-all"><UserPlus size={20} /></button>
             </div>
           </div>
-<div className="bg-gradient-to-br from-[#6398A9] to-[#4A7A8A] p-6 rounded-[2.5rem] shadow-lg text-white mb-2 overflow-hidden relative">
+
+          <div className="bg-gradient-to-br from-[#6398A9] to-[#4A7A8A] p-6 rounded-[2.5rem] shadow-lg text-white mb-2 overflow-hidden relative">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-3xl rounded-full -mr-10 -mt-10"></div>
             <div className="relative z-10 flex justify-between items-center">
               <div className="space-y-1">
@@ -1016,27 +1030,28 @@ const walletBalance = (() => {
                   <Wallet size={16} /> 目前公積金餘額
                 </p>
                 <h2 className="text-4xl font-serif font-bold">
-                  ₩ {walletBalance.toLocaleString()}
+                  ₩ {walletCash.toLocaleString()}
                 </h2>
               </div>
               <div className="text-right">
                 <p className="text-[11px] font-bold text-white/60 mb-1">約合台幣</p>
-                <p className="text-lg font-bold font-serif">$ {Math.round(walletBalance / exchangeRate).toLocaleString()}</p>
+                <p className="text-lg font-bold font-serif">$ {Math.round(walletCash / exchangeRate).toLocaleString()}</p>
               </div>
             </div>
             <div className="mt-4 pt-4 border-t border-white/10 flex gap-4">
               <div className="flex-1 bg-white/10 p-3 rounded-2xl text-center border border-white/5">
                 <p className="text-[10px] font-bold text-white/50 mb-1 tracking-widest">庫存狀態</p>
-                <p className="text-sm font-black">{walletBalance > 0 ? "資金充裕" : walletBalance === 0 ? "餘額為零" : "預算超支！"}</p>
+                <p className="text-sm font-black">{walletCash > 0 ? "資金充裕" : walletCash === 0 ? "餘額為零" : "預算超支！"}</p>
               </div>
               <div className="flex-1 bg-white/10 p-3 rounded-2xl text-center border border-white/5">
                 <p className="text-[10px] font-bold text-white/50 mb-1 tracking-widest">建議操作</p>
-                <p className="text-sm font-black text-[#F9B95C]">{walletBalance < 10000 ? "建議收錢" : "暫時免繳"}</p>
+                <p className="text-sm font-black text-[#F9B95C]">{walletCash < 10000 ? "建議收錢" : "暫時免繳"}</p>
               </div>
             </div>
           </div>
+
           {/* 2. 動作按鈕 (一分為三) */}
- <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <button
               onClick={() => { setIsAiMode(true); setIsAddMode(false); setIsDepositMode(false); setErrorMsg(""); }}
               className={`py-4 rounded-2xl font-black tracking-widest text-[13px] flex flex-col items-center justify-center gap-1 transition-all border ${isAiMode ? 'bg-[#F9B95C] text-white shadow-md border-[#F9B95C]' : 'bg-white text-slate-500 border-slate-200 hover:border-[#F9B95C]/50'}`}
@@ -1051,8 +1066,13 @@ const walletBalance = (() => {
               <Receipt size={20} /> 記一筆消費
             </button>
             <button
-              // 點擊存錢時，強制設定分攤者為「公積金錢包」，且分類設為 deposit
-              onClick={() => { setIsDepositMode(true); setIsAddMode(false); setIsAiMode(false); setErrorMsg(""); setNewExp({ title: "存入公積金", amount: "", payers: {}, sharers: ["💰 公積金錢包"], category: "deposit" }); }}
+              // 關鍵優化：一打開就預設把所有真人加入 payers 名單，金額設為 0
+              onClick={() => {
+                setIsDepositMode(true); setIsAddMode(false); setIsAiMode(false); setErrorMsg("");
+                const defaultPayers = {};
+                members.filter(m => !m.isWallet).forEach(m => defaultPayers[m.name] = 0);
+                setNewExp({ title: "存入公積金", amount: "", payers: defaultPayers, sharers: ["💰 公積金錢包"], category: "deposit" });
+              }}
               className={`py-4 rounded-2xl font-black tracking-widest text-[13px] flex flex-col items-center justify-center gap-1 transition-all border ${isDepositMode ? 'bg-[#96C7B3] text-white shadow-md border-[#96C7B3]' : 'bg-white border-slate-200 text-slate-500 hover:border-[#96C7B3]/50'}`}
             >
               <HandCoins size={20} /> 存入公積金
@@ -1060,7 +1080,7 @@ const walletBalance = (() => {
           </div>
 
           {/* 3. 輸入表單 (優化：緊接在按鈕下方) */}
-{isAiMode && (
+          {isAiMode && (
             <div className="bg-[#F9B95C]/10 p-6 md:p-8 rounded-[2.5rem] border border-[#F9B95C]/20 space-y-5 animate-in slide-in-from-top-5 shadow-sm">
               <div className="flex justify-between items-center text-[#F9B95C] font-bold tracking-widest text-lg font-serif"><span className="flex items-center gap-2"><Sparkles size={20} className="text-[#F9B95C]" /> 告訴 AI 發生了什麼？</span><button onClick={() => { setIsAiMode(false); setErrorMsg(""); }} className="hover:text-[#F9B95C]/70 transition-colors"><X size={24} /></button></div>
               <textarea placeholder="例如：烤肉 80000 韓元，S 付了 50000，A 付了 30000，平分。" className="w-full p-5 bg-white rounded-2xl text-sm md:text-base font-bold border-none outline-none focus:ring-2 ring-[#F9B95C]/40 h-32 resize-none shadow-sm text-slate-800" value={aiInput} onChange={e => setAiInput(e.target.value)} />
@@ -1068,46 +1088,69 @@ const walletBalance = (() => {
               <button onClick={handleAiParse} disabled={isAiLoading} className="w-full py-5 bg-[#F9B95C] text-white rounded-[1.5rem] font-bold tracking-widest text-base shadow-md hover:bg-[#E5A548] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-70">{isAiLoading ? <RefreshCw className="animate-spin" size={20} /> : <Navigation size={20} />} 執行智慧拆帳</button>
             </div>
           )}
-          {/* 專屬：存入公積金介面 */}
+
+          {/* 專屬：存入公積金極速介面 */}
           {isDepositMode && (
             <div className="bg-white p-6 md:p-8 rounded-[2.5rem] md:rounded-[3rem] shadow-lg border border-slate-100 space-y-6 animate-in slide-in-from-bottom-10">
               <div className="flex justify-between items-center font-bold tracking-widest font-serif">
                 <h3 className="text-slate-800 text-xl flex items-center gap-2"><HandCoins className="text-[#96C7B3]" /> 存入公積金</h3>
-                <button onClick={() => { setIsDepositMode(false); setErrorMsg(""); }} className="text-slate-400 hover:text-slate-600 transition-colors"><X size={24} /></button>
+                <button onClick={() => { setIsDepositMode(false); setErrorMsg(""); setDepositPerPerson(""); }} className="text-slate-400 hover:text-slate-600 transition-colors"><X size={24} /></button>
               </div>
 
-              <div className="space-y-5 bg-slate-50 p-5 md:p-6 rounded-3xl border border-slate-100 shadow-sm">
-                <p className="text-[14px] font-black text-[#96C7B3] text-center">本次總共要存入多少錢？</p>
+              <div className="space-y-4 bg-slate-50 p-5 md:p-6 rounded-3xl border border-slate-100 shadow-sm">
+                <p className="text-[14px] font-black text-[#96C7B3] text-center">每人要交多少錢？</p>
                 <div className="flex items-center justify-center gap-3 pt-2">
                   <span className="text-3xl font-serif text-[#6398A9]">₩</span>
-                  <input type="number" placeholder="0" className="w-1/2 bg-transparent border-b-2 border-[#96C7B3]/30 outline-none text-4xl md:text-5xl font-serif text-center text-slate-800" value={newExp.amount} onChange={e => setNewExp({ ...newExp, amount: e.target.value })} />
+                  <input
+                    type="number" placeholder="0"
+                    className="w-1/2 bg-transparent border-b-2 border-[#96C7B3]/30 outline-none text-4xl md:text-5xl font-serif text-center text-slate-800"
+                    value={depositPerPerson}
+                    onChange={e => {
+                      const val = Number(e.target.value);
+                      setDepositPerPerson(e.target.value);
+                      const activeNames = Object.keys(newExp.payers);
+                      const newPayers = {};
+                      activeNames.forEach(n => newPayers[n] = val);
+                      setNewExp({ ...newExp, amount: String(val * activeNames.length), payers: newPayers });
+                    }}
+                  />
                 </div>
+                <p className="text-center text-xs font-bold text-slate-400">系統自動加總：將存入 <span className="text-[#F9B95C] text-sm">₩ {newExp.amount || 0}</span></p>
               </div>
 
               <div className="space-y-4 pt-2 border-t border-slate-100">
-                <p className="text-[14px] font-black text-slate-600 ml-1">誰拿現金出來存？</p>
-                {/* 存錢介面自動過濾掉錢包本身，只顯示真人 */}
-                {sortedMembers.filter(m => !m.isWallet).map(m => (
-                  <div key={m.id} className="flex items-center justify-between p-2">
-                    <span className="text-[15px] font-black text-slate-600">{m.name}</span>
-                    <input
-                      type="number"
-                      placeholder="0"
-                      className="w-28 p-3 bg-white rounded-xl text-[14px] font-bold outline-none border border-slate-200 focus:border-[#96C7B3] text-right shadow-sm"
-                      value={newExp.payers[m.name] || ""}
-                      onChange={e => {
-                        const val = e.target.value;
-                        const n = { ...newExp.payers };
-                        if (!val || Number(val) === 0) delete n[m.name];
-                        else n[m.name] = val;
-                        setNewExp({ ...newExp, payers: n });
-                      }}
-                    />
-                  </div>
-                ))}
+                <p className="text-[14px] font-black text-slate-600 ml-1">誰有交錢？ <span className="text-xs text-slate-400">(預設全選，點擊可取消)</span></p>
+                <div className="flex flex-wrap gap-2">
+                  {sortedMembers.filter(m => !m.isWallet).map(m => {
+                    const isChecked = newExp.payers[m.name] !== undefined;
+                    return (
+                      <button
+                        key={m.id}
+                        onClick={() => {
+                          const newPayers = { ...newExp.payers };
+                          if (isChecked) delete newPayers[m.name];
+                          else newPayers[m.name] = Number(depositPerPerson) || 0;
+                          setNewExp({ ...newExp, amount: String((Number(depositPerPerson) || 0) * Object.keys(newPayers).length), payers: newPayers });
+                        }}
+                        className={`px-4 py-2 rounded-xl text-[14px] font-black transition-all border flex items-center gap-2 ${isChecked ? 'bg-[#96C7B3] text-white border-[#96C7B3] shadow-sm' : 'bg-slate-50 text-slate-400 border-slate-200'
+                          }`}
+                      >
+                        {isChecked ? <CheckCircle2 size={16} /> : <Circle size={16} />}
+                        {m.name}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
               {errorMsg && <div className="text-[#D7897F] bg-[#D7897F]/10 p-3 rounded-xl text-sm font-bold flex items-center gap-2 animate-in fade-in"><AlertCircle size={16} />{errorMsg}</div>}
-              <button onClick={addExpense} className="w-full py-5 bg-[#96C7B3] text-white rounded-[1.5rem] text-lg font-black tracking-widest shadow-md active:scale-95 hover:bg-[#7CB49D] transition-all mt-4">確認存入</button>
+              <button
+                onClick={() => {
+                  if (Object.keys(newExp.payers).length === 0) { setErrorMsg("至少要有一人交錢！"); return; }
+                  addExpense();
+                  setDepositPerPerson("");
+                }}
+                className="w-full py-5 bg-[#96C7B3] text-white rounded-[1.5rem] text-lg font-black tracking-widest shadow-md active:scale-95 hover:bg-[#7CB49D] transition-all mt-4"
+              >確認存入</button>
             </div>
           )}
 
@@ -1140,26 +1183,26 @@ const walletBalance = (() => {
                 <div className="flex items-center gap-3 pt-2"><span className="text-3xl font-serif text-[#6398A9]"> {currencyMode === 'KRW' ? '₩' : '$'}</span><input type="number" placeholder="0" className="w-full bg-transparent border-none outline-none text-4xl md:text-5xl font-serif placeholder:text-slate-200 text-slate-800" value={newExp.amount} onChange={e => setNewExp({ ...newExp, amount: e.target.value })} /></div>
               </div>
 
-              {/* 新增：誰參與了分攤 (可勾選剔除) */}
-              {/* 🚀 一般消費：誰需要分攤？ */}
+
+              {/* 一般消費：誰需要分攤？ */}
               <div className="space-y-4 pt-2 border-t border-slate-100">
                 <div className="flex justify-between items-center ml-1">
                   <p className="text-[14px] font-black text-slate-600">誰需要分攤？</p>
                   <span className="text-[12px] font-bold text-[#96C7B3] bg-[#96C7B3]/10 px-2 py-1 rounded-md">{newExp.sharers.length} 人</span>
                 </div>
 
-                {/* 快速選取按鈕 */}
                 <div className="flex gap-2 mb-2">
                   <button
                     onClick={() => setNewExp({ ...newExp, sharers: members.filter(m => !m.isWallet).map(m => m.name) })}
                     className="flex-1 py-2 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black hover:bg-slate-200 transition-colors"
                   >
-                    🍽️ 所有人 (不含錢包)
+                    🍽️ 所有人參與
                   </button>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  {sortedMembers.map(m => {
+                  {/* 🚨 關鍵防呆：過濾掉錢包，不讓錢包出現在分攤名單裡 */}
+                  {sortedMembers.filter(m => !m.isWallet).map(m => {
                     const isSelected = newExp.sharers.includes(m.name);
                     return (
                       <button
@@ -1169,9 +1212,7 @@ const walletBalance = (() => {
                           if (isSelected) setNewExp({ ...newExp, sharers: current.filter(x => x !== m.name) });
                           else setNewExp({ ...newExp, sharers: [...current, m.name] });
                         }}
-                        className={`px-4 py-2 rounded-xl text-[14px] font-black transition-all border ${m.isWallet
-                          ? (isSelected ? 'bg-[#6398A9] text-white border-[#6398A9]' : 'bg-white text-[#6398A9] border-[#6398A9]/30')
-                          : (isSelected ? 'bg-[#96C7B3] text-white border-[#96C7B3]' : 'bg-slate-50 text-slate-400 border-slate-200')
+                        className={`px-4 py-2 rounded-xl text-[14px] font-black transition-all border ${isSelected ? 'bg-[#96C7B3] text-white border-[#96C7B3]' : 'bg-slate-50 text-slate-400 border-slate-200'
                           }`}
                       >
                         {m.name}
@@ -1181,7 +1222,7 @@ const walletBalance = (() => {
                 </div>
               </div>
 
-              {/* 🚀 一般消費：誰墊付了錢？ */}
+              {/* 一般消費：誰墊付了錢？ */}
               <div className="space-y-4 pt-4 border-t border-slate-100">
                 <p className="text-[14px] font-black text-slate-600 ml-1">誰墊付了錢？</p>
                 {sortedMembers.map(m => (
@@ -1214,38 +1255,59 @@ const walletBalance = (() => {
             </div>
           )}
 
-          {/* 4. 結算卡片 (優化：提升對比度與可讀性，改為明亮清晰的卡片風格) */}
-          <div className="bg-white rounded-[3rem] md:rounded-[3.5rem] p-8 md:p-10 shadow-lg relative overflow-hidden border border-slate-200">
+
+          {/*  4. 終極結算卡片 (公家退補款 vs 私人恩怨) */}
+          <div className="bg-white rounded-[3rem] md:rounded-[3.5rem] p-8 md:p-10 shadow-lg relative overflow-hidden border border-slate-200 space-y-10">
             <div className="absolute top-0 right-0 w-48 h-48 bg-[#6398A9] blur-[100px] opacity-10"></div>
-            <div className="relative z-10 space-y-8">
-<p className="text-[15px] font-black text-slate-600 flex items-center gap-2 mb-2">
-  <span className="w-1.5 h-1.5 bg-[#F9B95C] rounded-full"></span>
-  最終分帳結論 (韓元)
-</p>
-              {settlement.length > 0 ? (
+
+            {/* 區塊 A：公積金實體對帳 */}
+            <div className="relative z-10 space-y-6">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 bg-[#6398A9]/10 rounded-full flex items-center justify-center text-[#6398A9]"><Wallet size={20} /></div>
+                <div>
+                  <p className="text-[15px] font-black text-slate-800">第一步：公積金退補款</p>
+                  <p className="text-[11px] font-bold text-slate-400 mt-1">依據實體錢包內剩餘的 ₩ {walletCash.toLocaleString()} 發放</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {Object.keys(publicBalances).filter(n => n !== "💰 公積金錢包").map(name => {
+                  const bal = Math.round(publicBalances[name]);
+                  if (bal === 0) return null;
+                  return (
+                    <div key={`pub-${name}`} className={`p-4 rounded-2xl border transition-all bg-white ${bal >= 0 ? 'border-[#6398A9]/30 shadow-sm' : 'border-[#D7897F]/30 shadow-sm'}`}>
+                      <p className={`text-[11px] font-bold uppercase tracking-wider ${bal >= 0 ? 'text-[#6398A9]' : 'text-[#D7897F]'}`}>{name}</p>
+                      <p className="text-[13px] font-black text-slate-600 mt-2 leading-snug">
+                        {bal >= 0 ? `👉 可拿回 ₩ ${bal.toLocaleString()}` : `👉 需補繳 ₩ ${Math.abs(bal).toLocaleString()}`}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 區塊 B：私人代墊結算 */}
+            <div className="relative z-10 space-y-6 pt-8 border-t border-slate-100">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 bg-[#F9B95C]/10 rounded-full flex items-center justify-center text-[#F9B95C]"><Users size={20} /></div>
+                <div>
+                  <p className="text-[15px] font-black text-slate-800">第二步：私人代墊轉帳</p>
+                  <p className="text-[11px] font-bold text-slate-400 mt-1">未動用公積金的私人欠款</p>
+                </div>
+              </div>
+
+              {privateSettlement.length > 0 ? (
                 <div className="space-y-3 bg-slate-50 p-6 rounded-3xl border border-slate-100 shadow-inner font-bold">
-                  {settlement.map((s, i) => (
-                    <div key={i} className="flex items-center gap-3 md:gap-4 text-[13px] md:text-[15px] font-bold tracking-wide">
+                  {privateSettlement.map((s, i) => (
+                    <div key={`priv-${i}`} className="flex items-center gap-3 md:gap-4 text-[13px] md:text-[15px] font-bold tracking-wide">
                       <span className="bg-[#D7897F] text-white px-3 py-1.5 rounded-xl shadow-sm">{s.f}</span>
                       <ArrowRight size={16} className="text-slate-300" />
-                      <span className="bg-[#96C7B3] text-white px-3 py-1.5 rounded-xl shadow-sm">{s.t}</span>
-                      <span className="ml-auto text-[#6398A9] font-serif text-lg md:text-xl">₩ {s.a.toLocaleString()}</span>
+                      <span className="bg-[#F9B95C] text-white px-3 py-1.5 rounded-xl shadow-sm">{s.t}</span>
+                      <span className="ml-auto text-slate-700 font-serif text-lg md:text-xl">₩ {s.a.toLocaleString()}</span>
                     </div>
                   ))}
                 </div>
-              ) : <div className="py-10 text-center text-slate-400 font-bold tracking-widest border-2 border-dashed border-slate-200 rounded-3xl">帳務已平衡，無需轉帳</div>}
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
-                {Object.keys(balances).map(name => (
-                  <div key={name} className={`p-4 rounded-2xl border transition-all bg-white ${balances[name] >= 0 ? 'border-[#96C7B3]/40 shadow-[0_4px_15px_rgba(150,199,179,0.15)]' : 'border-[#D7897F]/40 shadow-[0_4px_15px_rgba(215,137,127,0.15)]'}`}>
-                    <div className="flex justify-between items-center mb-2">
-                      <p className={`text-[10px] font-bold uppercase tracking-wider ${balances[name] >= 0 ? 'text-[#96C7B3]' : 'text-[#D7897F]'}`}>{name}</p>
-                    </div>
-                    <p className={`text-xl md:text-2xl font-serif font-bold ${balances[name] >= 0 ? 'text-[#96C7B3]' : 'text-[#D7897F]'}`}>
-                      {balances[name] >= 0 ? "+" : ""}{Math.round(balances[name]).toLocaleString()}
-                    </p>
-                  </div>
-                ))}
-              </div>
+              ) : <div className="py-8 text-center text-slate-400 font-bold tracking-widest border-2 border-dashed border-slate-200 rounded-3xl">私人帳務已平衡，無需轉帳</div>}
             </div>
           </div>
         </div>
@@ -1253,10 +1315,8 @@ const walletBalance = (() => {
         {/* 右欄：支出歷史清單 */}
         <div className="md:col-span-5 space-y-4 md:bg-slate-50 md:p-6 md:rounded-[3rem] md:border md:border-slate-200 md:h-fit">
           <div className="flex justify-between items-center px-2 mb-2">
-<p className="text-[15px] font-black text-slate-600 flex items-center gap-2">
-  <span className="w-1.5 h-1.5 bg-[#6398A9] rounded-full"></span>
-  歷史支出明細
-</p>          </div>
+            <p className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest">歷史支出明細</p>
+          </div>
           {expenses.sort((a, b) => b.createdAt - a.createdAt).map(e => (
             <div key={e.id} className="bg-white p-5 rounded-[2.2rem] flex items-center justify-between shadow-sm border border-slate-100 hover:shadow-md transition-shadow group">
               <div className="flex items-center gap-4">
@@ -1265,8 +1325,15 @@ const walletBalance = (() => {
                 </div>
                 <div className="min-w-0 pr-2">
                   <p className="font-bold text-sm md:text-[15px] text-slate-800 truncate tracking-wide">{e.title}</p>
-                  <p className="text-[9px] md:text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest truncate">
-                    {Object.keys(e.payers || {}).join(', ')} 墊付 · {e.sharers?.length || members.length}人分
+                  <p className="text-[9px] md:text-[10px] font-bold mt-1 uppercase tracking-widest truncate">
+                    {/* 智慧明細判斷：公家進出 vs 私人消費 */}
+                    {e.category === 'deposit' ? (
+                      <span className="text-[#96C7B3]">➕ 存入公積金 (共 {Object.keys(e.payers || {}).length} 人繳交)</span>
+                    ) : e.payers && e.payers["💰 公積金錢包"] ? (
+                      <span className="text-[#6398A9]">➖ 公積金支付 · {e.sharers?.length || members.length}人分享</span>
+                    ) : (
+                      <span className="text-slate-400">{Object.keys(e.payers || {}).join(', ')} 墊付 · {e.sharers?.length || members.length}人分</span>
+                    )}
                   </p>
                 </div>
               </div>
@@ -1373,12 +1440,12 @@ const CurrencySection = () => {
           </div>
 
           {/* 巨型歸零按鈕 */}
-<button onClick={clearAll} className="w-full md:w-28 py-6 md:py-0 self-stretch bg-[#F9B95C] text-white rounded-[2.5rem] flex flex-row md:flex-col items-center justify-center gap-3 hover:bg-[#E5A548] active:scale-95 transition-all shadow-md">
-  {/* ICON 從 28 放大到 32 */}
-  <Eraser size={32} />
-  {/* 文字從 text-sm 提升到 15px 並加粗，移除字間距 */}
-  <span className="text-[15px] font-black tracking-normal md:[writing-mode:vertical-lr]">歸零</span>
-</button>
+          <button onClick={clearAll} className="w-full md:w-28 py-6 md:py-0 self-stretch bg-[#F9B95C] text-white rounded-[2.5rem] flex flex-row md:flex-col items-center justify-center gap-3 hover:bg-[#E5A548] active:scale-95 transition-all shadow-md">
+            {/* ICON 從 28 放大到 32 */}
+            <Eraser size={32} />
+            {/* 文字從 text-sm 提升到 15px 並加粗，移除字間距 */}
+            <span className="text-[15px] font-black tracking-normal md:[writing-mode:vertical-lr]">歸零</span>
+          </button>
         </div>
 
         <div className="mt-8 pt-6 border-t border-slate-100 flex justify-end">
