@@ -865,7 +865,14 @@ const SplitBillSection = ({ user }) => {
 
   useEffect(() => {
     if (!user) return;
-    const unsubM = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'members'), (s) => setMembers(s.docs.map(d => ({ id: d.id, ...d.data() }))), (err) => console.warn("Sync error:", err));
+const unsubM = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'members'), (s) => {
+  const fetchedMembers = s.docs.map(d => ({ id: d.id, ...d.data() }));
+  // 核心邏輯：如果成員名單是空的，自動新增公積金錢包
+  if (fetchedMembers.length === 0) {
+    addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'members'), { name: "💰 公積金錢包", isWallet: true });
+  }
+  setMembers(fetchedMembers);
+}, (err) => console.warn("Sync error:", err));
     const unsubE = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'expenses'), (s) => setExpenses(s.docs.map(d => ({ id: d.id, ...d.data() }))), (err) => console.warn("Sync error:", err));
     return () => { unsubM(); unsubE(); };
   }, [user]);
@@ -957,7 +964,21 @@ const SplitBillSection = ({ user }) => {
     }
     return s;
   })();
-
+const walletBalance = (() => {
+    let total = 0;
+    expenses.forEach(exp => {
+      // 邏輯：如果這筆錢是「公積金錢包」墊付的，餘額減少
+      if (exp.payers["💰 公積金錢包"]) {
+        total -= Number(exp.payers["💰 公積金錢包"]);
+      }
+      // 邏輯：如果這筆錢分攤者包含「公積金錢包」（例如大家收錢存進去），餘額增加
+      if (exp.sharers.includes("💰 公積金錢包")) {
+        const perShare = exp.amount / exp.sharers.length;
+        total += perShare;
+      }
+    });
+    return Math.round(total);
+  })();
   return (
     <div className="p-4 md:p-0 animate-in fade-in duration-500 text-slate-800 pb-24">
       <div className="md:grid md:grid-cols-12 md:gap-8 space-y-6 md:space-y-0">
@@ -980,7 +1001,33 @@ const SplitBillSection = ({ user }) => {
               <button onClick={async () => { if (!newMember.trim()) return; await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'members'), { name: newMember.trim() }); setNewMember(""); }} className="bg-[#96C7B3] text-white p-4 rounded-2xl shadow-md hover:bg-[#7CB49D] active:scale-95 transition-all"><UserPlus size={20} /></button>
             </div>
           </div>
-
+<div className="bg-gradient-to-br from-[#6398A9] to-[#4A7A8A] p-6 rounded-[2.5rem] shadow-lg text-white mb-2 overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-3xl rounded-full -mr-10 -mt-10"></div>
+            <div className="relative z-10 flex justify-between items-center">
+              <div className="space-y-1">
+                <p className="text-[13px] font-black text-white/80 uppercase tracking-wider flex items-center gap-2">
+                  <Wallet size={16} /> 目前公積金餘額
+                </p>
+                <h2 className="text-4xl font-serif font-bold">
+                  ₩ {walletBalance.toLocaleString()}
+                </h2>
+              </div>
+              <div className="text-right">
+                <p className="text-[11px] font-bold text-white/60 mb-1">約合台幣</p>
+                <p className="text-lg font-bold font-serif">$ {Math.round(walletBalance / exchangeRate).toLocaleString()}</p>
+              </div>
+            </div>
+            <div className="mt-4 pt-4 border-t border-white/10 flex gap-4">
+              <div className="flex-1 bg-white/10 p-3 rounded-2xl text-center border border-white/5">
+                <p className="text-[10px] font-bold text-white/50 mb-1 tracking-widest">庫存狀態</p>
+                <p className="text-sm font-black">{walletBalance > 0 ? "資金充裕" : walletBalance === 0 ? "餘額為零" : "預算超支！"}</p>
+              </div>
+              <div className="flex-1 bg-white/10 p-3 rounded-2xl text-center border border-white/5">
+                <p className="text-[10px] font-bold text-white/50 mb-1 tracking-widest">建議操作</p>
+                <p className="text-sm font-black text-[#F9B95C]">{walletBalance < 10000 ? "建議收錢" : "暫時免繳"}</p>
+              </div>
+            </div>
+          </div>
           {/* 2. 動作按鈕 (優化：移至最上方，無需滑動即可點擊) */}
           <div className="grid grid-cols-2 gap-4">
             <button
