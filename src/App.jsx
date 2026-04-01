@@ -157,36 +157,45 @@ const TranslateSection = ({ user }) => {
     localStorage.setItem('customSurvivalPhrases', JSON.stringify(survivalPhrases));
   }, [survivalPhrases]);
 
-  // 核心修復 2：精簡且強大的 speak 函數
-// 🚀 核心升級：改用瀏覽器原生 Web Speech API (穩定、免費、防封殺)
+// 核心升級：Web Speech API (終極防 Bug 版)
   const speak = (text, id = null) => {
     if (!text) return;
-    // 一樣先過濾掉括號內的羅馬拼音，只留韓文
     const cleanKoreanText = text.split('(')[0].trim();
     if (!cleanKoreanText) return;
 
-    // 1. 防止連點：如果當前有聲音在唸，先把它切斷
+    // 1. 先切斷之前的語音
     window.speechSynthesis.cancel();
 
-    // 2. 立即變色/轉圈
+    // 2. 立即啟動 UI 轉圈圈動畫
     if (id) setCurrentlySpeakingId(id);
 
-    // 3. 建立語音物件並設定參數
-    const utterance = new SpeechSynthesisUtterance(cleanKoreanText);
-    utterance.lang = 'ko-KR'; // 🇰🇷 關鍵：直接指定語言為韓文！
-    utterance.rate = 0.9;     // 微調：把語速稍微放慢一點點 (0.9倍速)，讓韓國人聽得更清楚
+    // 防護網 A：使用 setTimeout 延遲 50 毫秒，避免 cancel() 把新的聲音也砍掉
+    setTimeout(() => {
+      const utterance = new SpeechSynthesisUtterance(cleanKoreanText);
+      utterance.lang = 'ko-KR'; // 指定語言為韓文
+      utterance.rate = 0.9;     // 稍微放慢語速，比較有禮貌
 
-    // 4. 綁定事件：唸完或出錯時，關閉 UI 轉圈圈動畫
-    utterance.onend = () => setCurrentlySpeakingId(null);
-    utterance.onerror = (e) => {
-      console.warn("Speech synthesis error:", e);
-      setCurrentlySpeakingId(null);
-    };
+      // 防護網 B：主動尋找系統內的韓文語音包，強力塞給它 (解決部分手機裝死不唸的問題)
+      const voices = window.speechSynthesis.getVoices();
+      const koreanVoice = voices.find(v => v.lang.includes('ko'));
+      if (koreanVoice) {
+        utterance.voice = koreanVoice;
+      }
 
-    // 5. 播放聲音！
-    window.speechSynthesis.speak(utterance);
+      // 綁定動畫結束事件
+      utterance.onend = () => setCurrentlySpeakingId(null);
+      utterance.onerror = (e) => {
+        console.warn("語音合成失敗:", e);
+        setCurrentlySpeakingId(null);
+      };
+
+      // 防護網 C：綁定到全域變數，防止被瀏覽器的「垃圾回收機制 (GC)」偷偷當垃圾清掉
+      window.speechSynthesisUtteranceBackup = utterance;
+
+      // 播放聲音！
+      window.speechSynthesis.speak(utterance);
+    }, 50);
   };
-  // --- 接下來是 handleAiTranslate ... ---
 
   const handleAiTranslate = async () => {
     if (!newPhrase.title.trim() || isTranslating) return;
