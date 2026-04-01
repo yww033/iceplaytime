@@ -158,31 +158,33 @@ const TranslateSection = ({ user }) => {
   }, [survivalPhrases]);
 
   // 核心修復 2：精簡且強大的 speak 函數
-const speak = (text, id = null) => {
+// 🚀 核心升級：改用瀏覽器原生 Web Speech API (穩定、免費、防封殺)
+  const speak = (text, id = null) => {
     if (!text) return;
+    // 一樣先過濾掉括號內的羅馬拼音，只留韓文
     const cleanKoreanText = text.split('(')[0].trim();
     if (!cleanKoreanText) return;
 
-    // 1. 立即變色/轉圈
+    // 1. 防止連點：如果當前有聲音在唸，先把它切斷
+    window.speechSynthesis.cancel();
+
+    // 2. 立即變色/轉圈
     if (id) setCurrentlySpeakingId(id);
 
-    // 2. 取得全域播放器並更換網址
-    const player = audioRef.current;
-    player.src = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(cleanKoreanText)}&tl=ko&client=tw-ob`;
+    // 3. 建立語音物件並設定參數
+    const utterance = new SpeechSynthesisUtterance(cleanKoreanText);
+    utterance.lang = 'ko-KR'; // 🇰🇷 關鍵：直接指定語言為韓文！
+    utterance.rate = 0.9;     // 微調：把語速稍微放慢一點點 (0.9倍速)，讓韓國人聽得更清楚
 
-    // 3. 設定監聽器：播完或失敗都要變回原色
-    player.onended = () => setCurrentlySpeakingId(null);
-    player.onerror = () => setCurrentlySpeakingId(null);
+    // 4. 綁定事件：唸完或出錯時，關閉 UI 轉圈圈動畫
+    utterance.onend = () => setCurrentlySpeakingId(null);
+    utterance.onerror = (e) => {
+      console.warn("Speech synthesis error:", e);
+      setCurrentlySpeakingId(null);
+    };
 
-    // 4. 強制執行播放
-    const playPromise = player.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(error => {
-        console.warn("Audio play blocked:", error);
-        // 如果被系統擋住，2秒後強制讓 UI 恢復正常
-        setTimeout(() => setCurrentlySpeakingId(null), 2000);
-      });
-    }
+    // 5. 播放聲音！
+    window.speechSynthesis.speak(utterance);
   };
   // --- 接下來是 handleAiTranslate ... ---
 
