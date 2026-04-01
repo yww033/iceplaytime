@@ -158,7 +158,7 @@ const TranslateSection = ({ user }) => {
   }, [survivalPhrases]);
 
   // 核心修復 2：精簡且強大的 speak 函數
-  const speak = (text, id = null) => {
+const speak = (text, id = null) => {
     if (!text) return;
     const cleanKoreanText = text.split('(')[0].trim();
     if (!cleanKoreanText) return;
@@ -184,7 +184,6 @@ const TranslateSection = ({ user }) => {
       });
     }
   };
-
   // --- 接下來是 handleAiTranslate ... ---
 
   const handleAiTranslate = async () => {
